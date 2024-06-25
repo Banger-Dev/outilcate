@@ -1,40 +1,49 @@
-import altair as alt
-import numpy as np
-import pandas as pd
-import streamlit as st
+def categoriser_mots_cles(mots_cles, categories):
+    """
+    Catégorise les mots clés en fonction des thématiques.
 
-"""
-# Welcome to Streamlit!
+    Args:
+    - mots_cles: List of str, les mots clés à catégoriser.
+    - categories: Dict, les thématiques et leurs mots clés associés.
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+    Returns:
+    - Dict, les mots clés catégorisés par thématique.
+    """
+    categorisation = {categorie: [] for categorie in categories}
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+    for mot in mots_cles:
+        trouve = False
+        for categorie, mots_cles_pertinents in categories.items():
+            if mot in mots_cles_pertinents:
+                categorisation[categorie].append(mot)
+                trouve = True
+                break
+        if not trouve:
+            if "Autres" not in categorisation:
+                categorisation["Autres"] = []
+            categorisation["Autres"].append(mot)
 
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
+    return categorisation
 
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
+# Exemple de catégories avec mots clés associés
+categories = {
+    "Énergie Houlomotrice": ["houlomotrice", "énergie houlomotrice", "houlomoteur", "centrale pelamis", "colonne d'eau oscillante"],
+    "Déferlement": ["déferlement définition", "déferlement vague", "déferlement vent"],
+    "Houle": ["houle et vague", "définition houle", "effet de la houle", "évolution d'une vague"],
+    "Vagues": ["puissance d'une vague", "vague atlantique", "vague mer", "cycle des vagues mer", "différence vague houle"],
+    "Électricité": ["énergie électrique déf", "énergie des vagues électricité", "exposé sur l'énergie"]
+}
 
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
+# Exemple de mots clés à catégoriser
+mots_cles_a_categoriser = [
+    "alternateur hydrolienne", "houlomotrice", "cagué definition", "énergie houlomotrice", 
+    "houlomoteur", "centrale pelamis", "colonne d'eau oscillante", "comment mesurer la houle",
+    "puissance d'une vague", "déferlement vague", "houle et vague", "évolution d'une vague"
+]
 
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
+# Catégoriser les mots clés
+mots_cles_categorises = categoriser_mots_cles(mots_cles_a_categoriser, categories)
 
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+# Afficher les mots clés catégorisés
+for categorie, mots in mots_cles_categorises.items():
+    print(f"{categorie} : {mots}")
